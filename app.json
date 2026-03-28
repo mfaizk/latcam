@@ -23,6 +23,29 @@
       },
       "predictiveBackGestureEnabled": false
     },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow LatCam to access your camera to take photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow LatCam to use your location to add GPS data to your photos."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow LatCam to save photos to your library.",
+          "savePhotosPermission": "Allow LatCam to save stamped photos to your library."
+        }
+      ],
+      "expo-asset",
+      "expo-font"
+    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }
