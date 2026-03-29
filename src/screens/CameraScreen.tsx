@@ -164,14 +164,24 @@ export default function CameraScreen() {
             encoding: FileSystem.EncodingType.Base64,
           });
 
+          // Try saving to device photo library (works in APK build; limited in Expo Go)
+          let savedToLibrary = false;
           try {
-            await MediaLibrary.saveToLibraryAsync(docPath);
+            if (hasMediaLibraryPermission) {
+              await MediaLibrary.saveToLibraryAsync(docPath);
+              savedToLibrary = true;
+            }
           } catch (_) {
-            // Expo Go restricts full media library access — in-app gallery still works
+            // Expo Go media library restriction — silent, in-app gallery still works
           }
 
           setLastSavedImage(docPath);
-          Alert.alert('✅ Saved', 'Photo saved with GPS & timestamp metadata.');
+          Alert.alert(
+            '✅ Photo Saved',
+            savedToLibrary
+              ? 'Saved to your device Gallery with GPS & timestamp.'
+              : 'Saved to LatCam gallery. Open in device Gallery requires a production build.',
+          );
         } catch (e) {
           console.error('Save error', e);
           Alert.alert('Error', 'Could not save photo.');
