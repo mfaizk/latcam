@@ -1,14 +1,13 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   Switch,
   StyleSheet,
   Platform,
-  Modal,
   TouchableOpacity,
-  TouchableWithoutFeedback,
 } from 'react-native';
+import { BottomSheetModal, BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 import { useMonetTheme } from '../theme/useMonetTheme';
 
 export interface CollapsableMenuProps {
@@ -25,83 +24,90 @@ export interface CollapsableMenuRef {
 }
 
 export const CollapsableMenu = forwardRef<CollapsableMenuRef, CollapsableMenuProps>((props, ref) => {
-  const [visible, setVisible] = useState(false);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const theme = useMonetTheme();
 
   useImperativeHandle(ref, () => ({
-    expand: () => setVisible(true),
-    close:  () => setVisible(false),
+    expand: () => bottomSheetRef.current?.present(),
+    close:  () => bottomSheetRef.current?.dismiss(),
   }));
 
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+      />
+    ),
+    []
+  );
+
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={() => setVisible(false)}>
-      <TouchableWithoutFeedback onPress={() => setVisible(false)}>
-        <View style={[styles.backdrop, { backgroundColor: theme.scrim }]}>
-          <TouchableWithoutFeedback>
-            <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
-              {/* Drag handle */}
-              <View style={[styles.dragHandle, { backgroundColor: theme.outline }]} />
-
-              <View style={styles.content}>
-                {/* Header */}
-                <View style={styles.header}>
-                  <Text style={[styles.title, { color: theme.onSurface }]}>Watermark Settings</Text>
-                  <TouchableOpacity onPress={() => setVisible(false)}>
-                    <Text style={[styles.doneText, { color: theme.primary }]}>Done</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <SettingRow
-                  label="Latitude"
-                  value={props.showLat}
-                  onValueChange={props.setShowLat}
-                  primaryColor={theme.primary}
-                  labelColor={theme.onSurface}
-                  trackOffColor={theme.surfaceVariant}
-                  dividerColor={theme.outlineVariant}
-                />
-                <SettingRow
-                  label="Longitude"
-                  value={props.showLng}
-                  onValueChange={props.setShowLng}
-                  primaryColor={theme.primary}
-                  labelColor={theme.onSurface}
-                  trackOffColor={theme.surfaceVariant}
-                  dividerColor={theme.outlineVariant}
-                />
-                <SettingRow
-                  label="Location Address"
-                  value={props.showLoc}
-                  onValueChange={props.setShowLoc}
-                  primaryColor={theme.primary}
-                  labelColor={theme.onSurface}
-                  trackOffColor={theme.surfaceVariant}
-                  dividerColor={theme.outlineVariant}
-                />
-                <SettingRow
-                  label="Date"
-                  value={props.showDate}
-                  onValueChange={props.setShowDate}
-                  primaryColor={theme.primary}
-                  labelColor={theme.onSurface}
-                  trackOffColor={theme.surfaceVariant}
-                  dividerColor={theme.outlineVariant}
-                />
-                <SettingRow
-                  label="Time"
-                  value={props.showTime}
-                  onValueChange={props.setShowTime}
-                  primaryColor={theme.primary}
-                  labelColor={theme.onSurface}
-                  trackOffColor={theme.surfaceVariant}
-                  dividerColor={theme.outlineVariant}
-                />
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
+    <BottomSheetModal
+      ref={bottomSheetRef}
+      enableDynamicSizing={true}
+      enablePanDownToClose={true}
+      backdropComponent={renderBackdrop}
+      backgroundStyle={{ backgroundColor: theme.surface, borderRadius: 24 }}
+      handleIndicatorStyle={{ backgroundColor: theme.outline, width: 50, height: 5 }}
+    >
+      <BottomSheetView style={[styles.content, { paddingBottom: Platform.OS === 'ios' ? 40 : 24 }]}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: theme.onSurface }]}>Watermark Settings</Text>
+          <TouchableOpacity onPress={() => bottomSheetRef.current?.dismiss()}>
+             <Text style={[styles.doneText, { color: theme.primary }]}>Done</Text>
+          </TouchableOpacity>
         </View>
-      </TouchableWithoutFeedback>
-    </Modal>
+
+        <SettingRow
+          label="Latitude"
+          value={props.showLat}
+          onValueChange={props.setShowLat}
+          primaryColor={theme.primary}
+          labelColor={theme.onSurface}
+          trackOffColor={theme.surfaceVariant}
+          dividerColor={theme.outlineVariant}
+        />
+        <SettingRow
+          label="Longitude"
+          value={props.showLng}
+          onValueChange={props.setShowLng}
+          primaryColor={theme.primary}
+          labelColor={theme.onSurface}
+          trackOffColor={theme.surfaceVariant}
+          dividerColor={theme.outlineVariant}
+        />
+        <SettingRow
+          label="Location Address"
+          value={props.showLoc}
+          onValueChange={props.setShowLoc}
+          primaryColor={theme.primary}
+          labelColor={theme.onSurface}
+          trackOffColor={theme.surfaceVariant}
+          dividerColor={theme.outlineVariant}
+        />
+        <SettingRow
+          label="Date"
+          value={props.showDate}
+          onValueChange={props.setShowDate}
+          primaryColor={theme.primary}
+          labelColor={theme.onSurface}
+          trackOffColor={theme.surfaceVariant}
+          dividerColor={theme.outlineVariant}
+        />
+        <SettingRow
+          label="Time"
+          value={props.showTime}
+          onValueChange={props.setShowTime}
+          primaryColor={theme.primary}
+          labelColor={theme.onSurface}
+          trackOffColor={theme.surfaceVariant}
+          dividerColor={theme.outlineVariant}
+        />
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 });
 
@@ -136,30 +142,7 @@ const SettingRow = ({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    height: '60%',
-    paddingTop: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 16,
-    elevation: 24,
-  },
-  dragHandle: {
-    width: 50,
-    height: 5,
-    borderRadius: 3,
-    alignSelf: 'center',
-    marginBottom: 8,
-  },
   content: {
-    flex: 1,
     paddingHorizontal: 24,
     paddingTop: 8,
   },

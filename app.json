@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow LatCam to access your camera to take photos."
+      },
+      "bundleIdentifier": "com.developer.latcam"
     },
     "android": {
       "adaptiveIcon": {
@@ -35,9 +39,9 @@
     },
     "plugins": [
       [
-        "expo-camera",
+        "react-native-vision-camera",
         {
-          "cameraPermission": "Allow LatCam to access your camera to take photos."
+          "cameraPermissionText": "Allow LatCam to access your camera to take photos."
         }
       ],
       [
